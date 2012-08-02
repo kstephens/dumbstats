@@ -3,10 +3,6 @@ module Dumbstats
   class Bucket
     include Initialization
 
-    def inspect
-      to_s
-    end
-
     KEYS =
     [
       :count,
