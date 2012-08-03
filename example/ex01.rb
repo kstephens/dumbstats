@@ -14,7 +14,7 @@ begin
     stats.add!(:d2, d2)
     stats.add!(:d6_2, d1 + d2)
   end
-  puts stats[:d1].h
-  puts stats[:d2].h
-  puts stats[:d6_2].h
+  stats[:d1].h
+  stats[:d2].h
+  stats[:d6_2].h
 end
