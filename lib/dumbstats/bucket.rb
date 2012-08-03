@@ -73,9 +73,10 @@ module Dumbstats
     def rate! dt
       @dt = dt
       @min = @max = nil
-      @avg = @sum.to_f / dt
+      @avg = (@count || @sum).to_f / dt
       self
     end
+    alias_method :rate, :avg
 
     def rate?
       ! ! @dt
