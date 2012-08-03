@@ -33,6 +33,9 @@ class Stats
       yield k, @s[k]
     end
   end
+  def clear!
+    @s.clear
+  end
   def method_missing sel, *args
     super unless args.empty? and ! block_given? and @s[sel]
   end
