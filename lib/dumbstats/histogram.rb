@@ -77,7 +77,7 @@ module Dumbstats
         @width.times do | i |
           x0 = @x_graph.x_to_v(i)
           x1 = @x_graph.x_to_v(i + 1)
-          $stderr.puts "  i=#{i} x0=#{x0.inspect} x1=#{x1.inspect} #{@x_graph.min.inspect} #{@x_graph.max.inspect}"
+          $stderr.puts "  i=#{i} x0=#{x0.inspect} x1=#{x1.inspect} #{@x_graph.min.inspect} #{@x_graph.max.inspect}" if @debug
           x0 = x0.to_i
           x1 = x1.to_i
 
