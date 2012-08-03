@@ -19,20 +19,15 @@ module Dumbstats
       @q = Queue.new
     end
 
-    def socket
-      unless @socket
-        s = TCPSocket.new(:address => host, :port => port)
-        @socket = s
-      end
-      @socket
-    rescue ::Exception
-      STDERR.puts "#{self} socket: failed #{err.inspect}"
-      sleep 10
+    def encode_path name
+      name.to_s.gsub(/[^a-z0-9_]/i, '-')
     end
 
-    def add! name, value, now = nil
+    def add! name, value, now = nil, o = nil
+      o ||= EMPTY_Hash
       now ||= self.now || Time.now.utc
-      enqueue! "#{prefix}#{name} #{value} #{now.to_i}\n"
+      name = encode_path(name)
+      enqueue! "#{prefix}#{o[:prefix]}#{name}#{o[:suffix]} #{value} #{now.to_i}\n"
       self
     end
 
