@@ -43,7 +43,7 @@ module Dumbstats
 
     def add! x
       @values << x if @values
-      x = x.value if x.respond_to?(:value)
+      x = x.to_numeric if x.respond_to?(:to_numeric)
       unless @min
         @min = @max = x
       else
