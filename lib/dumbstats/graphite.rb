@@ -1,5 +1,6 @@
 require 'thread' # Queue
 require 'socket'
+require 'time' # Time#iso8601
 
 module Dumbstats
   # Agent to dump Buckets into Graphite.
@@ -13,6 +14,7 @@ module Dumbstats
     attr_accessor :running, :thread
 
     attr_accessor :output_io
+    attr_accessor :log_io, :log_prefix
 
     def initialize *opts
       super
@@ -60,6 +62,9 @@ module Dumbstats
 
     def send! data
       output_io.write data
+      if log_io
+        log_io.write "#{Time.now.utc.iso8601} #{log_prefix}#{data}"
+      end
     end
 
     def output_io
