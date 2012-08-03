@@ -57,6 +57,14 @@ module Dumbstats
       self
     end
 
+    # Adds stat as a positive delta.
+    def add_delta! x0, x1
+      if x0 and (dx = x1 - x0) >= 0
+        add! dx
+      end
+      self
+    end
+
     def empty?
       ! @min || @max == @min
     end

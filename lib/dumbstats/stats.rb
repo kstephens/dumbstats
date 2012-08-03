@@ -53,6 +53,19 @@ class Stats
     self
   end
 
+  def add_delta! k, v0, v1
+    $stderr.puts "  add_delta! #{k.inspect} #{v0.inspect}, #{v1.inspect}" if @verbose
+    b = stat(k)
+    b.add_delta! v0, v1
+    @chain.add_delta! k, v0, v1 if @chain
+    self
+  end
+
+  def finish!
+    @s.values.each{|b| b.finish!}
+    self
+  end
+
   def put opts = { }
     o = opts[:output] || $stdout
     show_histogram = opts[:show_histogram]
