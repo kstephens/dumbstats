@@ -25,6 +25,10 @@ module Dumbstats
       update_from_hash! opts
     end
   end # module
+
+  EMPTY_Hash   = {}.freeze
+  EMPTY_Array  = [].freeze
+  EMPTY_String = ''.freeze
 end # module
 
 require 'dumbstats/stats'
