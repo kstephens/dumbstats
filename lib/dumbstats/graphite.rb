@@ -12,6 +12,8 @@ module Dumbstats
 
     attr_accessor :running, :thread
 
+    attr_accessor :output_io
+
     def initialize *opts
       super
       @q = Queue.new
@@ -39,30 +41,47 @@ module Dumbstats
       now = opts[:now]
       now ||= self.now || Time.now.utc
       if b.rate?
-        add! "#{b.name}.per_sec", v, now
+        add! b.name, b.rate, now, :prefix => opts[:prefix], :suffix => '.per_sec'
       else
         b.to_a.each do | k, v |
-          add! "#{b.name}.#{k}" v, now
+          next if a = opts[:ignore] and a.include?(k)
+          add! b.name, v, now, :prefix => opts[:prefix], :suffix => '.' << encode_path(k)
         end
       end
     end
 
     def enqueue! data
-      @q.enqueue data
+      @q << data
     end
 
     def run!
       @running = true
       @thread = Thread.current
       while @running
-        send! @q.dequeue
+        send! @q.pop
       end
       self
     end
 
     def send! data
-      s = socket
-      s.write data
+      output_io.write data
+    end
+
+    def output_io
+      @output_io || socket
+    end
+
+    def socket
+      unless @socket
+        s = TCPSocket.new(host || '127.0.0.1', port || 2003) # CORRECT DEFAULT PORT?
+        s.connect
+        @socket = s
+      end
+      @socket
+    rescue ::Exception => exc
+      STDERR.puts "#{self} socket: failed #{exc.inspect}\n  #{exc.backtrace * "\n  "}"
+      sleep 10
+      retry
     end
 
   end
