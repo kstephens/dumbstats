@@ -77,6 +77,10 @@ module Dumbstats
       self
     end
 
+    def rate?
+      ! ! @dt
+    end
+
     def finish!
       if @dt
         return self
