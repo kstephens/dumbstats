@@ -69,7 +69,6 @@ module Dumbstats
     def socket
       unless @socket
         s = TCPSocket.new(host || '127.0.0.1', port || 2003) # CORRECT DEFAULT PORT?
-        s.connect
         @socket = s
       end
       @socket
