@@ -3,9 +3,9 @@ require File.expand_path('../lib/dumbstats/version', __FILE__)
 
 Gem::Specification.new do |gem|
   gem.authors       = ["Kurt Stephens"]
-  gem.email         = ["kurt@enova.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.email         = ["ks.ruby@kurtstephens.com"]
+  gem.description   = %q{Collect data, generate stats, draw histograms, send to Graphite, do stuff in Ruby. }
+  gem.summary       = %q{Simple stats collection}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($\)
