@@ -1,3 +1,5 @@
+require 'dumbstats'
+
 module Dumbstats
   # Collects details.
   class Bucket

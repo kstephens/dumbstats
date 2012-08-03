@@ -1,4 +1,5 @@
 require 'dumbstats/stats'
+require 'dumbstats/graph'
 
 gem 'terminal-table'
 require 'terminal-table'
@@ -25,7 +26,7 @@ module Dumbstats
       return [ ] if @values.size < 2
       @x_graph = Graph.new(:min => @min, :max => @max, :values => @values, :width => @width)
       return [ ] if @x_graph.empty?
-      @x_graph.fix_width!
+      # @x_graph.fix_width!
 
       @buckets = Hash.new { |h, k| b = Bucket.new; b.name = k; h[k] = b }
       @values.each do | v |
@@ -64,7 +65,7 @@ module Dumbstats
         s.padding_right = 1
 
         # Header:
-        h = [ '<', '>', 'cnt', '%', "cnt h", "min", "avg", "max" ]
+        h = [ '>=', '<', 'cnt', '%', "cnt h", "min", "avg", "max" ]
         align_right = [ 0, 1, 2, 3, 5, 6, 7 ]
         if @show_sum
           h.push('sum', '%', 'sum h')
@@ -74,8 +75,12 @@ module Dumbstats
 
         cnt_sum = sum_sum = 0
         @width.times do | i |
-          x0 = @x_graph.x_to_v(i).to_i
-          x1 = @x_graph.x_to_v(i + 1).to_i - 1
+          x0 = @x_graph.x_to_v(i)
+          x1 = @x_graph.x_to_v(i + 1)
+          $stderr.puts "  i=#{i} x0=#{x0.inspect} x1=#{x1.inspect} #{@x_graph.min.inspect} #{@x_graph.max.inspect}"
+          x0 = x0.to_i
+          x1 = x1.to_i
+
           b = @buckets[i]
           b.finish!
 
