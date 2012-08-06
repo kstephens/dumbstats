@@ -23,6 +23,7 @@ class Stats
   def stat k
     @s[k] ||= Bucket.new(:name => k, :values => [ ])
   end
+
   def [] k
     @s[k] || @s[k.to_sym]
   end
@@ -36,6 +37,12 @@ class Stats
   end
   def clear!
     @s.clear
+  end
+  def update other
+    other.each do | k, v |
+      @s[k] = v
+    end
+    self
   end
   def method_missing sel, *args
     super unless args.empty? and ! block_given? and @s[sel]
