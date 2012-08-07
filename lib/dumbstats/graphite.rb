@@ -63,6 +63,7 @@ module Dumbstats
     def send! data
       output_io.write data
       if log_io
+        log_io.seek(0, IO::SEEK_END) rescue nil
         log_io.write "#{Time.now.utc.iso8601} #{log_prefix}#{data}"
       end
     end
