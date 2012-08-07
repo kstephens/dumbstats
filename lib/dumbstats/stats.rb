@@ -65,7 +65,7 @@ class Stats
   end
 
   def add_delta! k, v0, v1
-    $stderr.puts "  add_delta! #{k.inspect} #{v0.inspect}, #{v1.inspect}" if @verbose
+    $stderr.puts "  add_delta! #{k.inspect} #{v0.inspect} #{v1.inspect}" if @verbose
     b = stat(k)
     b.add_delta! v0, v1
     @chain.add_delta! k, v0, v1 if @chain
