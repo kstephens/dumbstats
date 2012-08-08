@@ -7,13 +7,28 @@ module Dumbstats
   class Graphite
     include Initialization
 
+    # Host/Port to Graphite.
+    # host defaults to 127.0.0.1.
+    # port defaults to 2003.
     attr_accessor :host, :port
 
-    attr_accessor :prefix, :now
+    # Unexcaped Graphite path prefix.
+    attr_accessor :prefix
 
-    attr_accessor :running, :thread
+    # Time to use for each #add!.
+    attr_accessor :now
 
+    # True if #run! is exceuting.
+    # Can be set to false to terminate #run! gracefully.
+    attr_accessor :running
+
+    # The Thread in #run!.
+    attr_accessor :thread
+
+    # IO object to use instead of #socket.
     attr_accessor :output_io
+
+    # IO object to log everything #send! to #socket.
     attr_accessor :log_io, :log_prefix
 
     def initialize *opts
@@ -45,12 +60,17 @@ module Dumbstats
           add! b.name, v, now, :prefix => opts[:prefix], :suffix => '.' << encode_path(k)
         end
       end
+      self
     end
 
+    # Adds raw data to internal Queue.
     def enqueue! data
       @q << data
+      self
     end
 
+    # Consumes internal Queue, calls #send! till #running is false.
+    # Typically run in a separate Thread.
     def run!
       @running = true
       @thread = Thread.current
@@ -60,24 +80,52 @@ module Dumbstats
       self
     end
 
+    # Sends data to #output_io and #log_io.
     def send! data
+      send_output_io! data
+      send_log_io! data if log_io
+      self
+    end
+
+    # Will rescue exceptions and close #socket.
+    def send_output_io! data
       output_io.write data
-      if log_io
-        log_io.seek(0, IO::SEEK_END) rescue nil
-        log_io.write "#{Time.now.utc.iso8601} #{log_prefix}#{data}"
+      self
+    rescue ::SystemExit, ::Interrupt, ::SignalException
+      raise
+    rescue ::Exception => exc
+      $stderr.puts "#{Time.now.utc.iso8601} #{$$} #{self} ERROR in send_output_io! #{exc.inspect}"
+      if @socket
+        @socket.close rescue nil
+        @socket = nil
       end
+      self
+    end
+
+    # Will rescue IO errors.
+    def send_log_io! data
+      log_io.seek(0, IO::SEEK_END) rescue nil
+      log_io.write "#{Time.now.utc.iso8601} #{log_prefix}#{data}"
+      self
+    rescue ::SystemExit, ::Interrupt, ::SignalException
+      raise
+    rescue ::Exception => exc
+      $stderr.puts "#{Time.now.utc.iso8601} #{$$} #{self} ERROR in log! #{exc.inspect}"
+      self
     end
 
     def output_io
       @output_io || socket
     end
 
+    # Will retry after 10 sec if TCPSocket fails.
     def socket
-      unless @socket
-        s = TCPSocket.new(host || '127.0.0.1', port || 2003) # CORRECT DEFAULT PORT?
-        @socket = s
-      end
+      return @socket if @socket
+      s = TCPSocket.new(host || '127.0.0.1', port || 2003) # CORRECT DEFAULT PORT?
+      @socket = s
       @socket
+    rescue ::SystemExit, ::Interrupt, ::SignalException
+      raise
     rescue ::Exception => exc
       STDERR.puts "#{self} socket: failed #{exc.inspect}\n  #{exc.backtrace * "\n  "}"
       sleep 10
