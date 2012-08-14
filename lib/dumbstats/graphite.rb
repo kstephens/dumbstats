@@ -82,7 +82,7 @@ module Dumbstats
 
     # Sends data to #output_io and #log_io.
     def send! data
-      send_output_io! data
+      send_output_io! data if @output_io || host
       send_log_io! data if log_io
       self
     end
