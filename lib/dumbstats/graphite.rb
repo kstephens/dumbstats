@@ -110,7 +110,7 @@ module Dumbstats
     rescue ::SystemExit, ::Interrupt, ::SignalException
       raise
     rescue ::Exception => exc
-      $stderr.puts "#{Time.now.utc.iso8601} #{$$} #{self} ERROR in log! #{exc.inspect}"
+      $stderr.puts "#{Time.now.utc.iso8601} #{$$} #{self} ERROR in send_log_io! #{exc.inspect}"
       self
     end
 
