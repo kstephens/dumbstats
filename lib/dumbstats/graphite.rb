@@ -12,7 +12,7 @@ module Dumbstats
     # port defaults to 2003.
     attr_accessor :host, :port
 
-    # Unexcaped Graphite path prefix.
+    # Unescaped Graphite path prefix.
     attr_accessor :prefix
 
     # Time to use for each #add!.
