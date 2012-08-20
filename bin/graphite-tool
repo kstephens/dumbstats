@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+$:.unshift File.expand_path('../../lib', __FILE__)
+
+begin
+  args = ARGV
+  cmd = args.shift
+  case cmd
+  when 'collect'
+    require 'dumbstats/graphite/collector'
+    Dumbstats::Graphite::Collector.new.main!(args)
+  when 'aggregate'
+    require 'dumbstats/graphite/aggregator'
+    Dumbstats::Graphite::Aggregator.new.main!(args)
+  else
+    raise "Unknown cmd: #{cmd.inspect}"
+  end
+rescue ::Exception => exc
+  $stderr.puts "#{$0} #{cmd}: ERROR: #{exc.inspect}\n  #{exc.backtrace * "\n  "}"
+end

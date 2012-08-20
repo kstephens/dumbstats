@@ -1,10 +1,10 @@
-require 'thread' # Queue
-require 'socket'
-require 'time' # Time#iso8601
+require 'dumbstats/graphite'
+require 'dumbstats/graphite/formatter'
 
 module Dumbstats
-  # Agent to dump Buckets into Graphite.
   class Graphite
+  # Agent to dump Buckets into Graphite.
+  class Agent
     include Initialization
 
     # Host/Port to Graphite.
@@ -13,7 +13,7 @@ module Dumbstats
     attr_accessor :host, :port
 
     # Unescaped Graphite path prefix.
-    attr_accessor :prefix
+    attr_accessor :formatter, :prefix
 
     # Time to use for each #add!.
     attr_accessor :now
@@ -34,32 +34,20 @@ module Dumbstats
     def initialize *opts
       super
       @q = Queue.new
+      @formatter ||= Formatter.new(:output => self, :prefix => @prefix)
     end
 
     def encode_path name
-      name.to_s.gsub(/[^a-z0-9_]/i, '-')
+      @formatter.encode_path name
     end
 
-    def add! name, value, now = nil, o = nil
-      o ||= EMPTY_Hash
-      now ||= self.now || Time.now.utc
-      name = encode_path(name)
-      enqueue! "#{prefix}#{o[:prefix]}#{name}#{o[:suffix]} #{value} #{now.to_i}\n"
+    def add! *args
+      @formatter.add! *args
       self
     end
 
-    def add_bucket! b, opts = nil
-      opts ||= EMPTY_Hash
-      now = opts[:now]
-      now ||= self.now || Time.now.utc
-      if b.rate?
-        add! b.name, b.rate, now, :prefix => opts[:prefix], :suffix => '.per_sec'
-      else
-        b.to_a.each do | k, v |
-          next if a = opts[:ignore] and a.include?(k)
-          add! b.name, v, now, :prefix => opts[:prefix], :suffix => '.' << encode_path(k)
-        end
-      end
+    def add_bucket! *args
+      @formatter.add_bucket! *args
       self
     end
 
@@ -68,6 +56,7 @@ module Dumbstats
       @q << data
       self
     end
+    alias :call :enqueue!
 
     # Consumes internal Queue, calls #send! till #running is false.
     # Typically run in a separate Thread.
@@ -132,5 +121,7 @@ module Dumbstats
       retry
     end
 
-  end
-end
+  end # class
+  end # module
+end # module
+
