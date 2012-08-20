@@ -26,7 +26,7 @@ module Dumbstats
       return [ ] if @values.size < 2
       @x_graph = Graph.new(:min => @min, :max => @max, :values => @values, :width => @width)
       return [ ] if @x_graph.empty?
-      # @x_graph.fix_width!
+      @x_graph.fix_width!
 
       @buckets = Hash.new { |h, k| b = Bucket.new; b.name = k; h[k] = b }
       @values.each do | v |
