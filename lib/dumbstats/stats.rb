@@ -30,6 +30,9 @@ class Stats
   def keys
     @s.keys.sort_by{|s| s.to_s}
   end
+  def to_h
+    @s
+  end
   def each
     keys.each do | k |
       yield k, @s[k]

@@ -14,6 +14,8 @@ module Dumbstats
       # Time to use for each #add!.
       attr_accessor :now
 
+      # Output per_X records for rate Buckets.
+      # per_sec is true by default.
       attr_accessor :per_sec, :per_min, :per_hr, :per_day
 
       def initialize *opts
@@ -40,9 +42,9 @@ module Dumbstats
         now ||= self.now || Time.now.utc
         if b.rate?
           add! b.name, b.rate, now, opts.dup.update(:prefix => opts[:prefix], :suffix => '.per_sec') if @per_sec || opts[:per_sec]
-          add! b.name, b.rate, now * 60, opts.dup.update(:prefix => opts[:prefix], :suffix => '.per_min') if @per_min || opts[:per_min]
-          add! b.name, b.rate, now * 3600, opts.dup.update(:prefix => opts[:prefix], :suffix => '.per_hr') if @per_hr || opts[:per_hr]
-          add! b.name, b.rate, now * 86400, opts.dup.update(:prefix => opts[:prefix], :suffix => '.per_day') if @per_day || opts[:per_day]
+          add! b.name, b.rate * 60 , now, opts.dup.update(:prefix => opts[:prefix], :suffix => '.per_min') if @per_min || opts[:per_min]
+          add! b.name, b.rate * 3600, now, opts.dup.update(:prefix => opts[:prefix], :suffix => '.per_hr') if @per_hr || opts[:per_hr]
+          add! b.name, b.rate * 86400, now, opts.dup.update(:prefix => opts[:prefix], :suffix => '.per_day') if @per_day || opts[:per_day]
         else
           b.to_a.each do | k, v |
             next if a = opts[:ignore] and a.include?(k)
