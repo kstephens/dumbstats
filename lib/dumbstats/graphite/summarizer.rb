@@ -3,7 +3,7 @@ require 'dumbstats/graphite'
 module Dumbstats
   module Graphite
     # Summarize data into interval buckets.
-    class Aggregator
+    class Summarizer
       include Initialization
       attr_accessor :interval, :send_opts, :output
 
@@ -28,7 +28,7 @@ module Dumbstats
       alias :call :add!
 
       def send!
-        $stderr.puts "  send! dt = #{@dt}"
+        # $stderr.puts "  send! dt = #{@dt}"
         stats.finish!
         stats.each do | k, b |
           @output.add_bucket! b, send_opts.update(:time => @t1)

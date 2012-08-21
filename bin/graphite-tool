@@ -8,9 +8,9 @@ begin
   when 'collect'
     require 'dumbstats/graphite/collector'
     Dumbstats::Graphite::Collector.new.main!(args)
-  when 'aggregate'
-    require 'dumbstats/graphite/aggregator'
-    Dumbstats::Graphite::Aggregator.new.main!(args)
+  when 'aggregate', 'summary', 'summarizer'
+    require 'dumbstats/graphite/summarizer'
+    Dumbstats::Graphite::Summarizer.new.main!(args)
   else
     raise "Unknown cmd: #{cmd.inspect}"
   end
